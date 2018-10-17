@@ -1,5 +1,6 @@
 package com.shab.artificon;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,7 +12,7 @@ import com.shab.artificon.utils.AzureRestClient;
 
 @SpringBootApplication
 public class ArtificOnScrapperApplication implements CommandLineRunner {
-	
+
 	@Autowired
 	private AzureRestClient azureRestClient;
 
@@ -22,6 +23,11 @@ public class ArtificOnScrapperApplication implements CommandLineRunner {
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
 	}
 
 	@Override

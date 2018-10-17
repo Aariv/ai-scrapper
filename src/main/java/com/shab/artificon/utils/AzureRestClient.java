@@ -3,6 +3,10 @@
  */
 package com.shab.artificon.utils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +19,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.shab.artificon.model.AuthDto;
+import com.shab.artificon.model.User;
+import com.shab.artificon.model.UserDto;
 import com.shab.artificon.model.UserMasterDto;
+import com.shab.artificon.repository.IUserRepository;
 
 /**
  * @author zentere
@@ -26,6 +33,9 @@ public class AzureRestClient {
 
 	private final RestTemplate restTemplate;
 	private String token;
+
+	@Autowired
+	private IUserRepository userRepository;
 
 	public AzureRestClient(final RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
@@ -53,7 +63,7 @@ public class AzureRestClient {
 		ResponseEntity<AuthDto> response = restTemplate.postForEntity(constructLoginURL(), request, AuthDto.class);
 		System.out.println(response.getBody().getAccess_token());
 		this.token = response.getBody().getAccess_token();
-		getUsersFromAzure();
+		//getUsersFromAzure();
 	}
 
 	private String constructLoginURL() {
@@ -67,6 +77,24 @@ public class AzureRestClient {
 				HttpMethod.GET, httpEntity, new ParameterizedTypeReference<UserMasterDto>() {
 				});
 		UserMasterDto users = response.getBody();
+		updateAzureUsersInMySQL(users);
 		return users;
+	}
+
+	public void updateAzureUsersInMySQL(UserMasterDto userMasterDto) {
+		List<User> data = userMasterDto.getValue().stream().map(userDto -> convertToEntity(userDto))
+				.collect(Collectors.toList());
+		userRepository.saveAll(data);
+	}
+
+	private User convertToEntity(UserDto userDto) {
+		User user = new User();
+		user.setAzureId(userDto.getId());
+		user.setEmployeeId(userDto.getEmployeeId());
+		user.setJobTitle(userDto.getJobTitle());
+		user.setUserPrincipalName(userDto.getUserPrincipalName());
+		user.setUserType(userDto.getUserType());
+		user.setRegisteredMobile(userDto.getExtension_14b8a2d09aa64c28804c78276afbcd34_RegisteredMobile());
+		return user;
 	}
 }
