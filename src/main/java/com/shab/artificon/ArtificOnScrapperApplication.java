@@ -32,7 +32,7 @@ public class ArtificOnScrapperApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		azureRestClient.asureLoginAndToken();
-		azureRestClient.getUsersFromAzure();
+		//azureRestClient.asureLoginAndToken();
+		//azureRestClient.getUsersFromAzure();
 	}
 }

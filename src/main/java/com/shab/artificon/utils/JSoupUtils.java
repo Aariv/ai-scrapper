@@ -14,7 +14,7 @@ import com.shab.artificon.model.ArtificHelp;
 public class JSoupUtils {
 
 	public static void main(String[] args) throws IOException {
-
+		System.out.println(installPrinterUrlToHelp("https://support.office.com/en-us/article/outlook-not-responding-stuck-at-processing-stopped-working-freezes-or-hangs-5c313d04-64af-4441-82d2-44e5a43eee5a"));
 	}
 
 	public ArtificHelp convertUrlToHelp(String url) {
@@ -44,6 +44,28 @@ public class JSoupUtils {
 				}
 				artificHelp.setSteps(stringBuilder.toString());
 				break;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return artificHelp;
+
+	}
+	
+	public static ArtificHelp installPrinterUrlToHelp(String url) {
+		// https://support.office.com/en-us/article/download-and-install-or-reinstall-office-365-or-office-2019-on-a-pc-or-mac-4414eaaf-0478-48be-9c42-23adc4716658
+		ArtificHelp artificHelp = new ArtificHelp();
+		Document doc;
+		try {
+			doc = Jsoup.connect(url).get();
+			artificHelp.setName(doc.title());
+			Elements titles = doc.getElementsByClass("ocpSection");
+			for (Element title : titles) {
+				System.out.println(title.text());
+				Elements h1Tites = title.select("p");
+				for (Element element : h1Tites) {
+					System.out.println(element.text());
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
